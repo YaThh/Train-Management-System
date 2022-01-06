@@ -21,12 +21,16 @@ struct Node {
 };
 
 Node *sp;
+Node *sortHead;
 
 void init();
 void push(Train x);
 int pop(Train &x);
 void input_train_info(Train &train);
 void input_train_info_from_file(Train &train);
+void create_sort_list();
+void train_sorting_asc();
+void traverse(Node *peak);
 
 int main()
 {
@@ -35,10 +39,11 @@ int main()
     init();
     do {
         system("cls");
-        cout << "1. Input Train Information\n"
-            << "2. Input Train Information with file\n"
-            << "3. Outpt Train Information\n"
-            << "4. Quit\n"
+        cout << "1. Add train\n"
+            << "2. Add train from file\n"
+            << "3. Remove train\n"
+            << "4. Sort train ascending\n"
+            << "5. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
@@ -67,14 +72,21 @@ int main()
                         << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl
                         << "The number of passengers: " << train.passenger;
                 else
-                    cout << "There's no train";
+                    cout << "There is no train";
+                break;
+            }
+            case 4:
+            {
+                create_sort_list();
+                train_sorting_asc();
+                traverse(sortHead);
                 break;
             }
             default:
                 cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 3);
+    } while (choose >= 1 && choose <= 4);
     _getch();
     return 0;
 }
@@ -82,6 +94,7 @@ int main()
 void init()
 {
     sp = NULL;
+    sortHead = NULL;
 }
 
 void push(Train x)
@@ -166,4 +179,55 @@ void input_train_info_from_file(Train &train)
     }
     else
         cout << "Could not read the file";
+}
+
+void create_sort_list()
+{
+    Node *sortList;
+    Node *origin = sp;
+    while (origin != NULL)
+    {
+        sortList = new Node;
+        sortList->info = origin->info;
+        sortList->next = sortHead;
+        sortHead = sortList;
+        origin = origin->next;
+    }
+}
+
+void train_sorting_asc()
+{
+    if (sp == NULL)
+        return;
+    else
+    {
+        Node *p, *q;
+        p = sortHead;
+        while (p != NULL)
+        {
+            q = p->next;
+            while (q != NULL)
+            {
+                if (p->info.departDate.day > q->info.departDate.day)
+                {
+                    Train temp = p->info;
+                    p->info = q->info;
+                    q->info = temp;
+                }
+                q = q->next;
+            }
+            p = p->next;
+        }
+    }
+}
+
+void traverse(Node *peak)
+{
+    Node *p;
+    p = peak;
+    while(p != NULL)
+    {
+        cout << p->info.trainID << endl;
+        p = p->next;
+    }
 }
