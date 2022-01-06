@@ -1,13 +1,18 @@
 #include <iostream>
 #include <string>
 #include <conio.h>
+#include <fstream>
 using namespace std;
+
+struct Time {
+    string hour, minute, day, month, year;
+};
 
 struct Train {
     string tripID, trainID;
     string departure, destination;
-    int passenger;
-    int departTime, arrivalTime, departDate, arrivalDate;
+    string passenger;
+    Time departTime, arrivalTime, departDate, arrivalDate;
 };
 
 struct Node {
@@ -21,48 +26,55 @@ void init();
 void push(Train x);
 int pop(Train &x);
 void input_train_info(Train &train);
+void input_train_info_from_file(Train &train);
 
 int main()
 {
+    Train train;
     int choose;
+    init();
     do {
         system("cls");
         cout << "1. Input Train Information\n"
-            << "2. literally XIAO that fucking train\n"
-            << "3. Quit\n"
+            << "2. Input Train Information with file\n"
+            << "3. Outpt Train Information\n"
+            << "4. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
         {
             case 1:
             {
-                Train x;
-                input_train_info(x);
-                push(x);
+                input_train_info(train);
                 break;
             }
             case 2:
             {
-                Train x;
-                if (pop(x))
-                    cout << "Trip ID: " << x.tripID << endl
-                        << "Train ID: " << x.trainID << endl
-                        << "Departure: " << x.departure << endl
-                        << "Destination: " << x.destination << endl
-                        << "Depart time: " << x.departTime << endl
-                        << "Arrival Time: " << x.arrivalTime << endl
-                        << "Depart Date: " << x.departDate << endl
-                        << "Arrival Date: " << x.arrivalDate << endl
-                        << "The number of passengers: " << x.passenger;
+                input_train_info_from_file(train);
+                push(train);
+                break;
+            }
+            case 3:
+            {
+                if (pop(train))
+                    cout << "Trip ID: " << train.tripID << endl
+                        << "Train ID: " << train.trainID << endl
+                        << "Departure: " << train.departure << endl
+                        << "Destination: " << train.destination << endl
+                        << "Depart time: " << train.departTime.hour << ":" << train.departTime.minute << endl
+                        << "Arrival Time: " << train.arrivalTime.hour << ":" << train.arrivalTime.minute << endl
+                        << "Depart Date: " << train.departDate.day << "/" << train.departDate.month << "/" << train.departDate.year << endl
+                        << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl
+                        << "The number of passengers: " << train.passenger;
                 else
                     cout << "There's no train";
                 break;
             }
             default:
-                cout << "You just quitted, what a LOSER";
+                cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 2);
+    } while (choose >= 1 && choose <= 3);
     _getch();
     return 0;
 }
@@ -105,14 +117,53 @@ void input_train_info(Train &train)
     getline(cin, train.departure); 
     cout << "Input destination: ";
     getline(cin, train.destination);
-    cout <<  "Input depart time: ";
-    cin >> train.departTime;
-    cout << "Input arrival time: ";
-    cin >> train.arrivalTime;
-    cout << "Input depart date: ";
-    cin >> train.departDate;
-    cout << "Input arrival date: ";
-    cin >> train.arrivalDate;
+    cout <<  "Input depart time(HH:MM): ";
+    getline(cin, train.departTime.hour, ':');
+    getline(cin, train.departTime.minute);
+    cout << "Input arrival time(HH:MM): ";
+    getline(cin, train.arrivalTime.hour, ':');
+    getline(cin, train.arrivalTime.minute);
+    cout << "Input depart date(dd/mm/yyyy): ";
+    getline(cin, train.departDate.day, '/');
+    getline(cin, train.departDate.month, '/');
+    getline(cin, train.departDate.year);
+    cout << "Input arrival date(dd/mm/yyyy): ";
+    getline(cin, train.arrivalDate.day, '/');
+    getline(cin, train.arrivalDate.month, '/');
+    getline(cin, train.arrivalDate.year);
     cout << "Input the number of passengers: ";
     cin >> train.passenger;
+}
+
+void input_train_info_from_file(Train &train)
+{
+    ifstream inTrain;
+    inTrain.open("Train_List.txt");
+    if (inTrain.is_open())
+    {
+        while (!inTrain.eof())
+        {
+            getline(inTrain, train.tripID, '#');
+            getline(inTrain, train.trainID, '#');
+            getline(inTrain, train.departure, '#');
+            getline(inTrain, train.destination, '#');
+            getline(inTrain, train.departTime.hour, ':');
+            getline(inTrain, train.departTime.minute, '#');
+            getline(inTrain, train.arrivalTime.hour, ':');
+            getline(inTrain, train.arrivalTime.minute, '#');
+            getline(inTrain, train.departDate.day, '/');
+            getline(inTrain, train.departDate.month, '/');
+            getline(inTrain, train.departDate.year, '#');
+            getline(inTrain, train.arrivalDate.day, '/');
+            getline(inTrain, train.arrivalDate.month, '/');
+            getline(inTrain, train.arrivalDate.year, '#');
+            getline(inTrain, train.passenger);
+            if (!inTrain.eof())
+                push(train);
+        }
+        cout << "Read file successfully";
+        inTrain.close();
+    }
+    else
+        cout << "Could not read the file";
 }
