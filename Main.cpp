@@ -21,16 +21,17 @@ struct Node {
 };
 
 Node *sp;
-Node *sortHead;
+Node *sortHead_asc;
 
 void init();
 void push(Train x);
 int pop(Train &x);
 void input_train_info(Train &train);
 void input_train_info_from_file(Train &train);
-void create_sort_list();
+void create_sort_list(Node *&head);
 void train_sorting_asc();
 void traverse(Node *peak);
+void update_list(Node *&peak);
 
 int main()
 {
@@ -51,10 +52,12 @@ int main()
             case 1:
             {
                 input_train_info(train);
+                push(train);
                 break;
             }
             case 2:
             {
+                update_list(sp);
                 input_train_info_from_file(train);
                 push(train);
                 break;
@@ -77,9 +80,10 @@ int main()
             }
             case 4:
             {
-                create_sort_list();
+                create_sort_list(sortHead_asc);
                 train_sorting_asc();
-                traverse(sortHead);
+                traverse(sortHead_asc);
+                update_list(sortHead_asc);
                 break;
             }
             default:
@@ -94,7 +98,7 @@ int main()
 void init()
 {
     sp = NULL;
-    sortHead = NULL;
+    sortHead_asc = NULL;
 }
 
 void push(Train x)
@@ -181,7 +185,7 @@ void input_train_info_from_file(Train &train)
         cout << "Could not read the file";
 }
 
-void create_sort_list()
+void create_sort_list(Node *&head)
 {
     Node *sortList;
     Node *origin = sp;
@@ -189,8 +193,8 @@ void create_sort_list()
     {
         sortList = new Node;
         sortList->info = origin->info;
-        sortList->next = sortHead;
-        sortHead = sortList;
+        sortList->next = head;
+        head = sortList;
         origin = origin->next;
     }
 }
@@ -202,19 +206,51 @@ void train_sorting_asc()
     else
     {
         Node *p, *q;
-        p = sortHead;
+        p = sortHead_asc;
         while (p != NULL)
         {
             q = p->next;
             while (q != NULL)
             {
-                if (p->info.departDate.day > q->info.departDate.day)
+                if (p->info.departDate.year == q->info.departDate.year && p->info.departDate.month == q->info.departDate.month)
                 {
-                    Train temp = p->info;
-                    p->info = q->info;
-                    q->info = temp;
+                    if (p->info.departDate.day > q->info.departDate.day)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    else if (p->info.departDate.day == q->info.departDate.day)
+                    {
+                        if (p->info.trainID > q->info.trainID)
+                        {
+                            Train temp = p->info;
+                            p->info = q->info;
+                            q->info = temp;
+                        }
+                    }
+                    q = q->next;
                 }
-                q = q->next;
+                else if (p->info.departDate.year == q->info.departDate.year && p->info.departDate.month != q->info.departDate.month)
+                {
+                    if (p->info.departDate.month > q->info.departDate.month)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    q = q->next;
+                }
+                else if (p->info.departDate.year != q->info.departDate.year)
+                {
+                    if (p->info.departDate.year > q->info.departDate.year)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    q = q->next; 
+                }
             }
             p = p->next;
         }
@@ -225,9 +261,40 @@ void traverse(Node *peak)
 {
     Node *p;
     p = peak;
-    while(p != NULL)
+    int count;
+    while (p != NULL)
     {
         cout << p->info.trainID << endl;
+        cout << p->info.departDate.day << "/";
+        cout << p->info.departDate.month << "/";
+        cout << p->info.departDate.year << endl;
         p = p->next;
     }
+}
+
+void update_list(Node *&peak)
+{
+    if (peak == NULL)
+        return;
+    else
+        while (peak != NULL)
+        {
+            Node *p = peak;
+            peak = p->next;
+            delete p;
+        }
+}
+
+//Cau 8
+int checkPassenger(Node *peak) {
+    int totalPassenger = 0;
+    Node* p;
+    p = peak;
+    while (p != NULL) {
+        if ((((stoi(p->info.departDate.day) >= 29) && (stoi(p->info.departDate.day) <= 31)) && (stoi(p->info.departDate.month) == 12) && (stoi(p->info.departDate.year) == 2020))
+            || ((stoi(p->info.departDate.day) <= 3) && (stoi(p->info.departDate.month) == 1) && (stoi(p->info.departDate.year) == 2021)))
+            totalPassenger += stoi(p->info.passenger);
+        p = p->next;
+    }
+    return totalPassenger;
 }
