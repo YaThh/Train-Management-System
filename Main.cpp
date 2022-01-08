@@ -29,10 +29,13 @@ int pop(Train &x, Node *&peak);
 void input_train_info(Train &train);
 void input_train_info_from_file(Train &train, Node *&peak);
 void clone_sort_list(Node *&head, Node *originalHead);
-void train_sorting_asc(Node *peak);
+void sort_train_asc(Node *peak);
+void sort_train_desc(Node *peak);
 void traverse(Node *peak);
 void update_list(Node *&peak);
-int countPassenger(Node *peak);
+int count_passenger(Node *peak);
+void count_trainID(Node *&peak, Node *originalHead);
+void delete_train(Node *&peak, string trainID);
 
 int main()
 {
@@ -46,8 +49,9 @@ int main()
         cout << "1. Add train\n"
             << "2. Add train from file\n"
             << "3. Remove train\n"
-            << "4. Sort train ascending\n"
-            << "5. Quit\n"
+            << "4. Sort train descending\n"
+            << "5. Count trainID\n"
+            << "6. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
@@ -73,7 +77,6 @@ int main()
                 init(sp);
                 update_list(sp);
                 input_train_info_from_file(train, sp);
-                push(train, sp);
                 break;
             }
             case 3:
@@ -96,16 +99,23 @@ int main()
             {
                 init(sortHead_asc);
                 clone_sort_list(sortHead_asc, sp);
-                train_sorting_asc(sortHead_asc);
+                sort_train_desc(sortHead_asc);
                 traverse(sortHead_asc);
                 update_list(sortHead_asc);
+                break;
+            }
+            case 5:
+            {
+                Node *count;
+                init(count);
+                count_trainID(count, sp);
                 break;
             }
             default:
                 cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 4);
+    } while (choose >= 1 && choose <= 5);
     _getch();
     return 0;
 }
@@ -189,8 +199,7 @@ void input_train_info_from_file(Train &train, Node *&peak)
             getline(inTrain, train.arrivalDate.month, '/');
             getline(inTrain, train.arrivalDate.year, '#');
             getline(inTrain, train.passenger);
-            if (!inTrain.eof())
-                push(train, peak);
+            push(train, peak);
         }
         cout << "Read file successfully";
         inTrain.close();
@@ -213,7 +222,7 @@ void clone_sort_list(Node *&head, Node *originalHead)
     }
 }
 
-void train_sorting_asc(Node *peak)
+void sort_train_asc(Node *peak)
 {
     if (peak == NULL)
         return;
@@ -271,11 +280,68 @@ void train_sorting_asc(Node *peak)
     }
 }
 
+void sort_train_desc(Node *peak)
+{
+    if (peak == NULL)
+        return;
+    else
+    {
+        Node *p, *q;
+        p = peak;
+        while (p != NULL)
+        {
+            q = p->next;
+            while (q != NULL)
+            {
+                if (p->info.departDate.year == q->info.departDate.year && p->info.departDate.month == q->info.departDate.month)
+                {
+                    if (p->info.departDate.day < q->info.departDate.day)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    else if (p->info.departDate.day == q->info.departDate.day)
+                    {
+                        if (p->info.trainID < q->info.trainID)
+                        {
+                            Train temp = p->info;
+                            p->info = q->info;
+                            q->info = temp;
+                        }
+                    }
+                    q = q->next;
+                }
+                else if (p->info.departDate.year == q->info.departDate.year && p->info.departDate.month != q->info.departDate.month)
+                {
+                    if (p->info.departDate.month < q->info.departDate.month)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    q = q->next;
+                }
+                else if (p->info.departDate.year != q->info.departDate.year)
+                {
+                    if (p->info.departDate.year < q->info.departDate.year)
+                    {
+                        Train temp = p->info;
+                        p->info = q->info;
+                        q->info = temp;
+                    }
+                    q = q->next; 
+                }
+            }
+            p = p->next;
+        }
+    }
+}
+
 void traverse(Node *peak)
 {
     Node *p;
     p = peak;
-    int count;
     while (p != NULL)
     {
         cout << p->info.trainID << endl;
@@ -299,7 +365,31 @@ void update_list(Node *&peak)
         }
 }
 
-int countPassenger(Node *peak)
+void count_trainID(Node *&peak, Node *originalHead)
+{
+    clone_sort_list(peak, originalHead);
+    traverse(peak);
+    Node *p = peak, *temp;
+    while (p != NULL)
+    {
+        int count = 1;
+        Node *q = p->next;
+        while (q != NULL)
+        {
+            if (p->info.trainID== q->info.trainID)
+                count++;
+            q = q->next;
+        }
+        cout << p->info.trainID << ": " << count;
+        cout << endl;
+        temp = p;
+        temp = temp->next;
+        delete_train(p, p->info.trainID);
+        p = temp;
+    }
+}
+
+int count_passenger(Node *peak)
 {
     int totalPassenger = 0;
     Node* p;
@@ -311,4 +401,29 @@ int countPassenger(Node *peak)
         p = p->next;
     }
     return totalPassenger;
+}
+
+void delete_train(Node *&peak, string trainID)
+{
+    Node *p = peak, *q;
+    while (p->next != NULL)
+        p = p->next;
+    do {
+        q = peak;
+        if (q != p)
+        {
+            while (q->next != p)
+                q = q->next;
+            if (p->info.trainID == trainID)
+            {
+                q->next = p->next;
+                delete p;        
+                Node *p = q;
+            }
+            else
+                p = q;
+        }
+    } while (p != peak);
+    if (p->info.trainID == trainID)
+        delete p;
 }
