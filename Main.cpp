@@ -23,21 +23,24 @@ struct Node {
 Node *sp;
 Node *sortHead_asc;
 
-void init();
-void push(Train x);
-int pop(Train &x);
+void init(Node *&peak);
+void push(Train x, Node *&peak);
+int pop(Train &x, Node *&peak);
 void input_train_info(Train &train);
-void input_train_info_from_file(Train &train);
-void create_sort_list(Node *&head);
-void train_sorting_asc();
+void input_train_info_from_file(Train &train, Node *&peak);
+void clone_sort_list(Node *&head, Node *originalHead);
+void train_sorting_asc(Node *peak);
 void traverse(Node *peak);
 void update_list(Node *&peak);
+int countPassenger(Node *peak);
 
 int main()
 {
     Train train;
+    Node *sp;
+    Node *sortHead_asc;
+    bool check = false;
     int choose;
-    init();
     do {
         system("cls");
         cout << "1. Add train\n"
@@ -51,20 +54,31 @@ int main()
         {
             case 1:
             {
-                input_train_info(train);
-                push(train);
+                if (!check)
+                {
+                    init(sp);
+                    input_train_info(train);
+                    push(train, sp);
+                    check = true;
+                }
+                else
+                {
+                    input_train_info(train);
+                    push(train, sp);
+                }
                 break;
             }
             case 2:
             {
+                init(sp);
                 update_list(sp);
-                input_train_info_from_file(train);
-                push(train);
+                input_train_info_from_file(train, sp);
+                push(train, sp);
                 break;
             }
             case 3:
             {
-                if (pop(train))
+                if (pop(train, sp))
                     cout << "Trip ID: " << train.tripID << endl
                         << "Train ID: " << train.trainID << endl
                         << "Departure: " << train.departure << endl
@@ -80,8 +94,9 @@ int main()
             }
             case 4:
             {
-                create_sort_list(sortHead_asc);
-                train_sorting_asc();
+                init(sortHead_asc);
+                clone_sort_list(sortHead_asc, sp);
+                train_sorting_asc(sortHead_asc);
                 traverse(sortHead_asc);
                 update_list(sortHead_asc);
                 break;
@@ -95,28 +110,27 @@ int main()
     return 0;
 }
 
-void init()
+void init(Node *&peak)
 {
-    sp = NULL;
-    sortHead_asc = NULL;
+    peak = NULL;
 }
 
-void push(Train x)
+void push(Train x, Node *&peak)
 {
      Node *p;
      p = new Node;
      p->info = x;
-     p->next = sp;
-     sp = p;
+     p->next = peak;
+     peak = p;
 }
 
-int pop(Train &x)
+int pop(Train &x, Node *&peak)
 {
-    if (sp != NULL)
+    if (peak != NULL)
     {
-        Node *p = sp;
+        Node *p = peak;
         x = p->info;
-        sp = p->next;
+        peak = p->next;
         delete p;
         return 1;
     }
@@ -152,7 +166,7 @@ void input_train_info(Train &train)
     cin >> train.passenger;
 }
 
-void input_train_info_from_file(Train &train)
+void input_train_info_from_file(Train &train, Node *&peak)
 {
     ifstream inTrain;
     inTrain.open("Train_List.txt");
@@ -176,7 +190,7 @@ void input_train_info_from_file(Train &train)
             getline(inTrain, train.arrivalDate.year, '#');
             getline(inTrain, train.passenger);
             if (!inTrain.eof())
-                push(train);
+                push(train, peak);
         }
         cout << "Read file successfully";
         inTrain.close();
@@ -185,10 +199,10 @@ void input_train_info_from_file(Train &train)
         cout << "Could not read the file";
 }
 
-void create_sort_list(Node *&head)
+void clone_sort_list(Node *&head, Node *originalHead)
 {
     Node *sortList;
-    Node *origin = sp;
+    Node *origin = originalHead;
     while (origin != NULL)
     {
         sortList = new Node;
@@ -199,14 +213,14 @@ void create_sort_list(Node *&head)
     }
 }
 
-void train_sorting_asc()
+void train_sorting_asc(Node *peak)
 {
-    if (sp == NULL)
+    if (peak == NULL)
         return;
     else
     {
         Node *p, *q;
-        p = sortHead_asc;
+        p = peak;
         while (p != NULL)
         {
             q = p->next;
@@ -285,8 +299,8 @@ void update_list(Node *&peak)
         }
 }
 
-//Cau 8
-int checkPassenger(Node *peak) {
+int countPassenger(Node *peak)
+{
     int totalPassenger = 0;
     Node* p;
     p = peak;
