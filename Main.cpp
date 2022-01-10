@@ -33,7 +33,7 @@ void traverse(Node *peak);
 void update_list(Node *&peak);
 int count_passenger(Node *peak);
 void count_trainID(Node *peak, Node *originalHead);
-void delete_train(Node *&peak, Node *&originalHead);
+void sort_list(Node* peak);
 
 int main()
 {
@@ -379,47 +379,45 @@ int count_passenger(Node *peak)
 
 void count_trainID(Node *peak, Node *originalHead)
 {
-    clone_sort_list(peak, originalHead);
-    Node *p = peak;
-    Node *clone;
-    Node *temp;
-    clone_sort_list(clone, originalHead);
+     clone_sort_list(peak, originalHead);
+    sort_list(peak);
+    Node* p = peak;
+    Node* q = p->next;
     while (p != NULL)
     {
-        Node *q = p->next;
+        int count = 1;
+        if (q != NULL)
+        {
+            while (q->info.trainID == p->info.trainID)
+            {
+                count++;
+                q = q->next;
+            }
+        }
+        cout << p->info.trainID << ": " << count << endl;
+        while (p != q)
+            p = p->next;
+        q = q->next;
+    }
+}
+
+void sort_list(Node* peak)
+{
+    Node* p = peak;
+    while (p != NULL)
+    {
+        Node* q = p->next;
         while (q != NULL)
         {
-            if (q->info.trainID == p->info.trainID)
+            if (p->info.trainID > q->info.trainID)
             {
-                temp = q;
-                q = q->next;
-                delete_train(temp, p);
+                Train temp;
+                temp = p->info;
+                p->info = q->info;
+                q->info = temp;
             }
-            else
-                q = q->next;
+            q = q->next;
         }
         p = p->next;
     }
-    while (peak != NULL)
-    {
-        int count = 0;
-        while (clone != NULL)
-        {
-            if (peak->info.trainID == clone->info.trainID)
-                count++;
-            clone = clone->next;
-        }
-        clone_sort_list(clone, originalHead);
-        cout << peak->info.trainID << ": " << count << endl;
-        peak = peak->next;
-    } 
-}
-
-void delete_train(Node *&peak, Node *&originalHead)
-{
-    Node *p = originalHead;
-    while (p->next != peak)
-        p = p->next;
-    p->next = peak->next;
-    delete peak;
 }
