@@ -20,8 +20,6 @@ struct Node {
     Node *next;
 };
 
-Node *sp;
-Node *sortHead_asc;
 
 void init(Node *&peak);
 void push(Train x, Node *&peak);
@@ -34,8 +32,8 @@ void sort_train_desc(Node *peak);
 void traverse(Node *peak);
 void update_list(Node *&peak);
 int count_passenger(Node *peak);
-void count_trainID(Node *&peak, Node *originalHead);
-void delete_train(Node *&peak, string trainID);
+void count_trainID(Node *peak, Node *originalHead);
+void delete_train(Node *&peak, Node *&originalHead);
 
 int main()
 {
@@ -108,7 +106,7 @@ int main()
             {
                 Node *count;
                 init(count);
-                count_trainID(count, sp);
+                count_trainID(count, sp); 
                 break;
             }
             default:
@@ -365,30 +363,6 @@ void update_list(Node *&peak)
         }
 }
 
-void count_trainID(Node *&peak, Node *originalHead)
-{
-    clone_sort_list(peak, originalHead);
-    traverse(peak);
-    Node *p = peak, *temp;
-    while (p != NULL)
-    {
-        int count = 1;
-        Node *q = p->next;
-        while (q != NULL)
-        {
-            if (p->info.trainID== q->info.trainID)
-                count++;
-            q = q->next;
-        }
-        cout << p->info.trainID << ": " << count;
-        cout << endl;
-        temp = p;
-        temp = temp->next;
-        delete_train(p, p->info.trainID);
-        p = temp;
-    }
-}
-
 int count_passenger(Node *peak)
 {
     int totalPassenger = 0;
@@ -403,27 +377,49 @@ int count_passenger(Node *peak)
     return totalPassenger;
 }
 
-void delete_train(Node *&peak, string trainID)
+void count_trainID(Node *peak, Node *originalHead)
 {
-    Node *p = peak, *q;
-    while (p->next != NULL)
-        p = p->next;
-    do {
-        q = peak;
-        if (q != p)
+    clone_sort_list(peak, originalHead);
+    Node *p = peak;
+    Node *clone;
+    Node *temp;
+    clone_sort_list(clone, originalHead);
+    while (p != NULL)
+    {
+        Node *q = p->next;
+        while (q != NULL)
         {
-            while (q->next != p)
-                q = q->next;
-            if (p->info.trainID == trainID)
+            if (q->info.trainID == p->info.trainID)
             {
-                q->next = p->next;
-                delete p;        
-                Node *p = q;
+                temp = q;
+                q = q->next;
+                delete_train(temp, p);
             }
             else
-                p = q;
+                q = q->next;
         }
-    } while (p != peak);
-    if (p->info.trainID == trainID)
-        delete p;
+        p = p->next;
+    }
+    while (peak != NULL)
+    {
+        int count = 0;
+        while (clone != NULL)
+        {
+            if (peak->info.trainID == clone->info.trainID)
+                count++;
+            clone = clone->next;
+        }
+        clone_sort_list(clone, originalHead);
+        cout << peak->info.trainID << ": " << count << endl;
+        peak = peak->next;
+    } 
+}
+
+void delete_train(Node *&peak, Node *&originalHead)
+{
+    Node *p = originalHead;
+    while (p->next != peak)
+        p = p->next;
+    p->next = peak->next;
+    delete peak;
 }
