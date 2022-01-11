@@ -33,8 +33,12 @@ void sort_train_desc(Node *peak);
 void traverse(Node *peak);
 void update_list(Node *&peak);
 int count_passenger(Node *peak);
-void count_trip(Node *peak, Node *originalHead);
+void count_trip(Node *peak, Node *originalHead, Node *&archive);
 void sort_list(Node* peak);
+void find_trip_max(Node *peak, Node *originalHead, Node *&archive);
+void delete_first(Node *&peak);
+void delete_list(Node *&peak);
+int search_list(Node *peak, string trainID);
 
 int main()
 {
@@ -49,8 +53,9 @@ int main()
             << "2. Add train from file\n"
             << "3. Remove train\n"
             << "4. Sort train descending\n"
-            << "5. Count trainID\n"
-            << "6. Quit\n"
+            << "5. Count trip\n"
+            << "6. Find trip max\n"
+            << "7. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
@@ -105,16 +110,32 @@ int main()
             }
             case 5:
             {
-                Node *count;
-                init(count);
-                count_trip(count, sp); 
+                Node *countTrip;
+                Node *archive;
+                init(countTrip);
+                init(archive);
+                count_trip(countTrip, sp, archive);
+                while (archive != NULL)
+                {
+                    cout << archive->info.trainID << ": " << archive->info.trips << endl;
+                    archive = archive->next;
+                }
+                break;
+            }
+            case 6:
+            {
+                Node *tripMax;
+                Node *archive;
+                init(tripMax);
+                init(archive);
+                find_trip_max(tripMax, sp, archive);
                 break;
             }
             default:
                 cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 5);
+    } while (choose >= 1 && choose <= 6);
     _getch();
     return 0;
 }
@@ -378,12 +399,12 @@ int count_passenger(Node *peak)
     return totalPassenger;
 }
 
-void count_trip(Node *peak, Node *originalHead)
+void count_trip(Node *peak, Node *originalHead, Node *&archive)
 {
     clone_list(peak, originalHead);
     sort_list(peak);
-    Node* p = peak;
-    Node* q = p->next;
+    Node *p = peak;
+    Node *q = p->next;
     while (p != NULL)
     {
         int count = 1;
@@ -400,7 +421,7 @@ void count_trip(Node *peak, Node *originalHead)
         p->info.trips = count;
         if (count != 1)
         {
-            cout << p->info.trainID << ": " << count << endl;
+            push(p->info, archive);
             while (p != q)
                 p = p->next;
             if (q->next != NULL)
@@ -408,7 +429,7 @@ void count_trip(Node *peak, Node *originalHead)
         }
         else
         {
-            cout << p->info.trainID << ": " << count << endl;
+            push(p->info, archive);
             p = p->next;
             if (q->next != NULL)
                 q = p->next;
@@ -418,10 +439,10 @@ void count_trip(Node *peak, Node *originalHead)
 
 void sort_list(Node* peak)
 {
-    Node* p = peak;
+    Node *p = peak;
     while (p != NULL)
     {
-        Node* q = p->next;
+        Node *q = p->next;
         while (q != NULL)
         {
             if (p->info.trainID > q->info.trainID)
@@ -435,4 +456,63 @@ void sort_list(Node* peak)
         }
         p = p->next;
     }
+}
+
+void find_trip_max(Node *peak, Node *originalHead, Node *&archive)
+{
+    count_trip(peak, originalHead, archive);
+    Node *maxList = NULL;
+    Node *p = archive;
+    Node *q;
+    int max = p->info.trips;
+    while (p != NULL)
+    {
+        q = p->next;
+        while (q != NULL)
+        {
+            if (q->info.trips > max)
+            {
+                max = q->info.trips;
+                delete_list(maxList);
+                push(q->info, maxList);
+            }
+            else if (q->info.trips == max && !search_list(maxList, q->info.trainID))
+                push(q->info, maxList);
+            q = q->next;
+        }    
+        p = p->next;
+    }
+    cout << "Train with the most trips: " << endl;
+    while (maxList != NULL)
+    {
+        cout << maxList->info.trainID << ": " << maxList->info.trips << endl;
+        maxList = maxList->next;
+    }
+}
+
+void delete_first(Node *&peak)
+{
+    Node *p = peak;
+    if (peak == NULL)
+        return;
+    peak = peak->next;
+    delete p;
+}
+
+void delete_list(Node *&peak)
+{
+    while (peak != NULL)
+        delete_first(peak);
+}
+
+int search_list(Node *peak, string trainID)
+{
+    Node *p = peak;
+    while (p != NULL)
+    {
+        if (p->info.trainID == trainID)
+            return 1;
+        p = p->next;
+    }
+    return 0;
 }
