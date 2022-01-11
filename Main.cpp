@@ -386,18 +386,27 @@ void count_trainID(Node *peak, Node *originalHead)
     while (p != NULL)
     {
         int count = 1;
-        if (q != NULL)
+        while (q->info.trainID == p->info.trainID)
         {
-            while (q->info.trainID == p->info.trainID)
-            {
-                count++;
+            count++;
+            if (q->next != NULL)
                 q = q->next;
-            }
         }
-        cout << p->info.trainID << ": " << count << endl;
-        while (p != q)
+        if (count != 1)
+        {
+            cout << p->info.trainID << ": " << count << endl;
+            while (p != q)
+                p = p->next;
+            if (q->next != NULL)
+                q = p->next;
+        }
+        else
+        {
             p = p->next;
-        q = q->next;
+            cout << p->info.trainID << ": " << count << endl;
+            if (q->next != NULL)
+                q = p->next;
+        }
     }
 }
 
