@@ -13,6 +13,7 @@ struct Train {
     string departure, destination;
     string passenger;
     Time departTime, arrivalTime, departDate, arrivalDate;
+    int trips;
 };
 
 struct Node {
@@ -26,13 +27,13 @@ void push(Train x, Node *&peak);
 int pop(Train &x, Node *&peak);
 void input_train_info(Train &train);
 void input_train_info_from_file(Train &train, Node *&peak);
-void clone_sort_list(Node *&head, Node *originalHead);
+void clone_list(Node *&head, Node *originalHead);
 void sort_train_asc(Node *peak);
 void sort_train_desc(Node *peak);
 void traverse(Node *peak);
 void update_list(Node *&peak);
 int count_passenger(Node *peak);
-void count_trainID(Node *peak, Node *originalHead);
+void count_trip(Node *peak, Node *originalHead);
 void sort_list(Node* peak);
 
 int main()
@@ -96,7 +97,7 @@ int main()
             case 4:
             {
                 init(sortHead_asc);
-                clone_sort_list(sortHead_asc, sp);
+                clone_list(sortHead_asc, sp);
                 sort_train_desc(sortHead_asc);
                 traverse(sortHead_asc);
                 update_list(sortHead_asc);
@@ -106,7 +107,7 @@ int main()
             {
                 Node *count;
                 init(count);
-                count_trainID(count, sp); 
+                count_trip(count, sp); 
                 break;
             }
             default:
@@ -206,7 +207,7 @@ void input_train_info_from_file(Train &train, Node *&peak)
         cout << "Could not read the file";
 }
 
-void clone_sort_list(Node *&head, Node *originalHead)
+void clone_list(Node *&head, Node *originalHead)
 {
     Node *sortList;
     Node *origin = originalHead;
@@ -377,9 +378,9 @@ int count_passenger(Node *peak)
     return totalPassenger;
 }
 
-void count_trainID(Node *peak, Node *originalHead)
+void count_trip(Node *peak, Node *originalHead)
 {
-     clone_sort_list(peak, originalHead);
+    clone_list(peak, originalHead);
     sort_list(peak);
     Node* p = peak;
     Node* q = p->next;
@@ -388,10 +389,15 @@ void count_trainID(Node *peak, Node *originalHead)
         int count = 1;
         while (q->info.trainID == p->info.trainID)
         {
-            count++;
             if (q->next != NULL)
+            {
+                count++;
                 q = q->next;
-        }
+            }
+            else
+                break;
+        } 
+        p->info.trips = count;
         if (count != 1)
         {
             cout << p->info.trainID << ": " << count << endl;
@@ -402,8 +408,8 @@ void count_trainID(Node *peak, Node *originalHead)
         }
         else
         {
-            p = p->next;
             cout << p->info.trainID << ": " << count << endl;
+            p = p->next;
             if (q->next != NULL)
                 q = p->next;
         }
