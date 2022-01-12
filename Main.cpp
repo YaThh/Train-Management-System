@@ -31,7 +31,6 @@ void clone_list(Node *&head, Node *originalHead);
 void sort_train_asc(Node *peak);
 void sort_train_desc(Node *peak);
 void traverse(Node *peak);
-void update_list(Node *&peak);
 int count_passenger(Node *peak);
 void count_trip(Node *peak, Node *originalHead, Node *&archive);
 void sort_list(Node* peak);
@@ -44,18 +43,20 @@ int main()
 {
     Train train;
     Node *sp;
-    Node *sortHead_asc;
-    bool check = false;
+    Node *sortHead_asc, *sortHead_desc;
+    bool check = false, sortIn = false;
     int choose;
     do {
         system("cls");
         cout << "1. Add train\n"
             << "2. Add train from file\n"
             << "3. Remove train\n"
-            << "4. Sort train descending\n"
-            << "5. Count trip\n"
-            << "6. Find trip max\n"
-            << "7. Quit\n"
+            << "4. Sort train ascending\n"
+            << "5. Sort train after adding a new train\n"
+            << "6. Count trip\n"
+            << "7. Find trip max\n"
+            << "8. Count the number of passengers in Tet holiday\n"
+            << "8. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
@@ -79,63 +80,110 @@ int main()
             case 2:
             {
                 init(sp);
-                update_list(sp);
+                delete_list(sp);
                 input_train_info_from_file(train, sp);
+                check = true;
                 break;
             }
             case 3:
             {
-                if (pop(train, sp))
-                    cout << "Trip ID: " << train.tripID << endl
-                        << "Train ID: " << train.trainID << endl
-                        << "Departure: " << train.departure << endl
-                        << "Destination: " << train.destination << endl
-                        << "Depart time: " << train.departTime.hour << ":" << train.departTime.minute << endl
-                        << "Arrival Time: " << train.arrivalTime.hour << ":" << train.arrivalTime.minute << endl
-                        << "Depart Date: " << train.departDate.day << "/" << train.departDate.month << "/" << train.departDate.year << endl
-                        << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl
-                        << "The number of passengers: " << train.passenger;
+                if (check)
+                {
+                    if (pop(train, sp))
+                        cout << "Trip ID: " << train.tripID << endl
+                            << "Train ID: " << train.trainID << endl
+                            << "Departure: " << train.departure << endl
+                            << "Destination: " << train.destination << endl
+                            << "Depart time: " << train.departTime.hour << ":" << train.departTime.minute << endl
+                            << "Arrival Time: " << train.arrivalTime.hour << ":" << train.arrivalTime.minute << endl
+                            << "Depart Date: " << train.departDate.day << "/" << train.departDate.month << "/" << train.departDate.year << endl
+                            << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl
+                            << "The number of passengers: " << train.passenger;
+                    else
+                        cout << "There is no train";
+                }
                 else
-                    cout << "There is no train";
+                    cout << "No data";
                 break;
             }
             case 4:
             {
-                init(sortHead_asc);
-                clone_list(sortHead_asc, sp);
-                sort_train_desc(sortHead_asc);
-                traverse(sortHead_asc);
-                update_list(sortHead_asc);
+                if (check)
+                {
+                    init(sortHead_asc);
+                    clone_list(sortHead_asc, sp);
+                    sort_train_asc(sortHead_asc);
+                    traverse(sortHead_asc);
+                    sortIn = true;
+                }
+                else
+                    cout << "No data";
                 break;
             }
             case 5:
-            {
-                Node *countTrip;
-                Node *archive;
-                init(countTrip);
-                init(archive);
-                count_trip(countTrip, sp, archive);
-                while (archive != NULL)
+            {   if (check)
                 {
-                    cout << archive->info.trainID << ": " << archive->info.trips << endl;
-                    archive = archive->next;
-                }
+                    if (sortIn)
+                    {
+                        input_train_info(train);
+                        push(train, sortHead_asc);
+                        sort_train_asc(sortHead_asc);
+                        traverse(sortHead_asc);
+                    }
+                    else
+                        cout << "You must choose the option 4 first";
+                } 
+                else
+                    cout << "No data";
                 break;
             }
             case 6:
             {
-                Node *tripMax;
-                Node *archive;
-                init(tripMax);
-                init(archive);
-                find_trip_max(tripMax, sp, archive);
+                if (check)
+                {
+                    Node *countTrip;
+                    Node *archive;
+                    init(countTrip);
+                    init(archive);
+                    count_trip(countTrip, sp, archive);
+                    while (archive != NULL)
+                    {
+                        cout << archive->info.trainID << ": " << archive->info.trips << endl;
+                        archive = archive->next;
+                    }
+                }
+                else
+                    cout << "No data";
+                break;
+            }
+            case 7:
+            {
+                if (check)
+                {
+                    Node *tripMax;
+                    Node *archive;
+                    init(tripMax);
+                    init(archive);
+                    find_trip_max(tripMax, sp, archive);
+                }
+                else
+                    cout << "No data";
+                break;
+            }
+            case 8:
+            {
+                if (check)
+                    cout << "The number of passengers used train in Tet holiday: "
+                        << count_passenger(sp) << endl;
+                else
+                    cout << "No data";
                 break;
             }
             default:
                 cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 6);
+    } while (choose >= 1 && choose <= 8);
     _getch();
     return 0;
 }
@@ -370,19 +418,6 @@ void traverse(Node *peak)
         cout << p->info.departDate.year << endl;
         p = p->next;
     }
-}
-
-void update_list(Node *&peak)
-{
-    if (peak == NULL)
-        return;
-    else
-        while (peak != NULL)
-        {
-            Node *p = peak;
-            peak = p->next;
-            delete p;
-        }
 }
 
 int count_passenger(Node *peak)
