@@ -30,7 +30,7 @@ void input_train_info_from_file(Train &train, Node *&peak);
 void clone_list(Node *&head, Node *originalHead);
 void sort_train_asc(Node *peak);
 void sort_train_desc(Node *peak);
-void traverse(Node *peak);
+void traverse_list(Node *peak);
 int count_passenger(Node *peak);
 void count_trip(Node *peak, Node *originalHead, Node *&archive);
 void sort_list(Node* peak);
@@ -38,6 +38,9 @@ void find_trip_max(Node *peak, Node *originalHead, Node *&archive);
 void delete_first(Node *&peak);
 void delete_list(Node *&peak);
 int search_list(Node *peak, string trainID);
+void count_time(Node *peak);
+int find_time_max(Node* peak);
+void output(Node *peak);
 
 int main()
 {
@@ -56,7 +59,8 @@ int main()
             << "6. Count trip\n"
             << "7. Find trip max\n"
             << "8. Count the number of passengers in Tet holiday\n"
-            << "8. Quit\n"
+            << "9. Find the most runtime train\n"
+            << "10. Quit\n"
             << "Choose: ";
         cin >> choose;
         switch (choose)
@@ -113,7 +117,7 @@ int main()
                     init(sortHead_asc);
                     clone_list(sortHead_asc, sp);
                     sort_train_asc(sortHead_asc);
-                    traverse(sortHead_asc);
+                    traverse_list(sortHead_asc);
                     sortIn = true;
                 }
                 else
@@ -128,7 +132,7 @@ int main()
                         input_train_info(train);
                         push(train, sortHead_asc);
                         sort_train_asc(sortHead_asc);
-                        traverse(sortHead_asc);
+                        traverse_list(sortHead_asc);
                     }
                     else
                         cout << "You must choose the option 4 first";
@@ -175,6 +179,14 @@ int main()
                 if (check)
                     cout << "The number of passengers used train in Tet holiday: "
                         << count_passenger(sp) << endl;
+                else
+                    cout << "No data";
+                break;
+            }
+            case 9:
+            {
+                if (check)
+                    count_time(sp);
                 else
                     cout << "No data";
                 break;
@@ -267,7 +279,8 @@ void input_train_info_from_file(Train &train, Node *&peak)
             getline(inTrain, train.arrivalDate.month, '/');
             getline(inTrain, train.arrivalDate.year, '#');
             getline(inTrain, train.passenger);
-            push(train, peak);
+            if (!inTrain.eof())
+                push(train, peak);
         }
         cout << "Read file successfully";
         inTrain.close();
@@ -406,18 +419,34 @@ void sort_train_desc(Node *peak)
     }
 }
 
-void traverse(Node *peak)
+void traverse_list(Node *peak)
 {
     Node *p;
     p = peak;
     while (p != NULL)
     {
-        cout << p->info.trainID << endl;
-        cout << p->info.departDate.day << "/";
-        cout << p->info.departDate.month << "/";
-        cout << p->info.departDate.year << endl;
+        cout << p->info.trainID << ": "
+            << p->info.departDate.day << "/"
+            << p->info.departDate.month << "/"
+            << p->info.departDate.year << " - "
+            << p->info.arrivalDate.day << "/"
+            << p->info.arrivalDate.month << "/"
+            << p->info.arrivalDate.year << endl;
         p = p->next;
     }
+}
+
+void output(Node *peak)
+{
+    Node *p;
+    p = peak;
+    cout << p->info.trainID << ": "
+        << p->info.departDate.day << "/"
+        << p->info.departDate.month << "/"
+        << p->info.departDate.year << " - "
+        << p->info.arrivalDate.day << "/"
+        << p->info.arrivalDate.month << "/"
+        << p->info.arrivalDate.year << endl;
 }
 
 int count_passenger(Node *peak)
@@ -550,4 +579,129 @@ int search_list(Node *peak, string trainID)
         p = p->next;
     }
     return 0;
+}
+
+void count_time(Node* peak)
+{
+    Node* p, * q;
+    int max;
+    p = peak;
+    max = find_time_max(p);
+    while (p != NULL) {
+        int minuteA, h, d, dom = 0, m, y;
+        h = stoi(p->info.departTime.hour) * 60;
+        d = stoi(p->info.departDate.day) * 60 * 24;
+        for (int i = 1; i < stoi(p->info.departDate.month); i++) {
+            if (i == 1 || i == 3 || i == 5 || i == 7 || i == 8 || i == 10 || i == 12)
+                dom += 31;
+            else if (i == 4 || i == 6 || i == 9 || i == 11)
+                dom += 30;
+            else if (i == 2 && ((stoi(p->info.departDate.year) % 400 == 0) && (stoi(p->info.departDate.year) % 4 == 0 && stoi(p->info.departDate.year) % 100 != 0)))
+                dom += 29;
+            else
+                dom += 28;
+        }
+        m = dom * 60 * 24;
+        if (stoi(p->info.departDate.year) == stoi(p->info.arrivalDate.year))
+            y = 0;
+        else if ((stoi(p->info.departDate.year) % 400 == 0) && (stoi(p->info.departDate.year) % 4 == 0 && stoi(p->info.departDate.year) % 100 != 0))
+            y = (stoi(p->info.departDate.year) - 2000) * 366 * 60 * 24;
+        else
+            y = (stoi(p->info.departDate.year) - 2000) * 365 * 60 * 24;
+        minuteA = stoi(p->info.departTime.minute) + h + d + m + y;
+
+
+        int minuteB, h2, d2, dom2 = 0, m2, y2;
+        h2 = stoi(p->info.arrivalTime.hour) * 60;
+        d2 = stoi(p->info.arrivalDate.day) * 60 * 24;
+        for (int i = 1; i < stoi(p->info.arrivalDate.month); i++) {
+            if (i == 1 || i == 3 || i == 5 || i == 7 || i == 8 || i == 10 || i == 12)
+                dom2 += 31;
+            else if (i == 4 || i == 6 || i == 9 || i == 11)
+                dom2 += 30;
+            else if (i == 2 && ((stoi(p->info.arrivalDate.year) % 400 == 0) && (stoi(p->info.arrivalDate.year) % 4 == 0 && stoi(p->info.arrivalDate.year) % 100 != 0)))
+                dom2 += 29;
+            else
+                dom2 += 28;
+        }
+        m2 = dom2 * 60 * 24;
+        if (stoi(p->info.departDate.year) == stoi(p->info.arrivalDate.year))
+            y2 = 0;
+        else if ((stoi(p->info.arrivalDate.year) % 400 == 0) && (stoi(p->info.arrivalDate.year) % 4 == 0 && stoi(p->info.arrivalDate.year) % 100 != 0))
+            y2 = (stoi(p->info.arrivalDate.year) - 2000) * 366 * 60 * 24;
+        else
+            y2 = (stoi(p->info.arrivalDate.year) - 2000) * 365 * 60 * 24;
+        minuteB = stoi(p->info.arrivalTime.minute) + h2 + d2 + m2 + y2;
+
+
+        int totalM;
+        totalM = minuteB - minuteA;
+        if (max == totalM)
+        {
+            output(p);
+        }
+        p = p->next;
+    }
+}
+
+int find_time_max(Node* peak)
+{
+    int MAX = 0;
+    Node* p, * q;
+    p = peak;
+    while (p != NULL) {
+        int minuteA, h, d, dom = 0, m, y;
+        h = stoi(p->info.departTime.hour) * 60;
+        d = stoi(p->info.departDate.day) * 60 * 24;
+        for (int i = 1; i < stoi(p->info.departDate.month); i++) {
+            if (i == 1 || i == 3 || i == 5 || i == 7 || i == 8 || i == 10 || i == 12)
+                dom += 31;
+            else if (i == 4 || i == 6 || i == 9 || i == 11)
+                dom += 30;
+            else if (i == 2 && ((stoi(p->info.departDate.year) % 400 == 0) && (stoi(p->info.departDate.year) % 4 == 0 && stoi(p->info.departDate.year) % 100 != 0)))
+                dom += 29;
+            else
+                dom += 28;
+        }
+        m = dom * 60 * 24;
+        if (stoi(p->info.departDate.year) == stoi(p->info.arrivalDate.year))
+            y = 0;
+        else if ((stoi(p->info.departDate.year) % 400 == 0) && (stoi(p->info.departDate.year) % 4 == 0 && stoi(p->info.departDate.year) % 100 != 0))
+            y = (stoi(p->info.departDate.year) - 2000) * 366 * 60 * 24;
+        else
+            y = (stoi(p->info.departDate.year) - 2000) * 365 * 60 * 24;
+        minuteA = stoi(p->info.departTime.minute) + h + d + m + y;
+
+
+        int minuteB, h2, d2, dom2 = 0, m2, y2;
+        h2 = stoi(p->info.arrivalTime.hour) * 60;
+        d2 = stoi(p->info.arrivalDate.day) * 60 * 24;
+        for (int i = 1; i < stoi(p->info.arrivalDate.month); i++) {
+            if (i == 1 || i == 3 || i == 5 || i == 7 || i == 8 || i == 10 || i == 12)
+                dom2 += 31;
+            else if (i == 4 || i == 6 || i == 9 || i == 11)
+                dom2 += 30;
+            else if (i == 2 && ((stoi(p->info.arrivalDate.year) % 400 == 0) && (stoi(p->info.arrivalDate.year) % 4 == 0 && stoi(p->info.arrivalDate.year) % 100 != 0)))
+                dom2 += 29;
+            else
+                dom2 += 28;
+        }
+        m2 = dom2 * 60 * 24;
+        if (stoi(p->info.departDate.year) == stoi(p->info.arrivalDate.year))
+            y2 = 0;
+        else if ((stoi(p->info.arrivalDate.year) % 400 == 0) && (stoi(p->info.arrivalDate.year) % 4 == 0 && stoi(p->info.arrivalDate.year) % 100 != 0))
+            y2 = (stoi(p->info.arrivalDate.year) - 2000) * 366 * 60 * 24;
+        else
+            y2 = (stoi(p->info.arrivalDate.year) - 2000) * 365 * 60 * 24;
+        minuteB = stoi(p->info.arrivalTime.minute) + h2 + d2 + m2 + y2;
+
+
+        int totalM;
+        totalM = minuteB - minuteA;
+        if (MAX < totalM) {
+            MAX = totalM;
+        }
+        p = p->next;
+    }
+    return MAX;
 }
