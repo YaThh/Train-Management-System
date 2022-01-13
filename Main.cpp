@@ -242,21 +242,20 @@ void input_train_info(Train &train)
     getline(cin, train.departure); 
     cout << "Input destination: ";
     getline(cin, train.destination);
-    do{
+    do {
         cout <<  "Input depart time(HH:MM): ";
         getline(cin, train.departTime.hour, ':');
         getline(cin, train.departTime.minute);
-        cout << stoi(train.departTime.hour) << endl;
-        if (!check_time(stoi(train.departDate.hour), stoi(train.departTime.minute)))
-            cout << "Invalid input\n";
-    } while (!check_time(stoi(train.departDate.hour), stoi(train.departTime.minute)));
+        if (!check_time(stoi(train.departTime.hour), stoi(train.departTime.minute)))
+            cout << "Invalid\n";
+    } while (!check_time(stoi(train.departTime.hour), stoi(train.departTime.minute)));
     do {
         cout << "Input arrival time(HH:MM): ";
         getline(cin, train.arrivalTime.hour, ':');
         getline(cin, train.arrivalTime.minute);
         if (!check_time(stoi(train.arrivalTime.hour), stoi(train.arrivalTime.minute)))
-            cout << "Invalid input\n";
-    } while (!check_time(stoi(train.arrivalTime.hour), stoi(train.arrivalTime.minute)));
+            cout << "Invalid\n";
+    } while (!check_time(stoi(train.departTime.hour), stoi(train.arrivalTime.minute)));
     do {
         cout << "Input depart date(dd/mm/yyyy): ";
         getline(cin, train.departDate.day, '/');
@@ -706,7 +705,7 @@ bool check_input_date(int day, int month, int year)
 
 bool check_time(int hour, int min)
 {
-    if (hour < 0 || hour > 23 || min < 0 || min > 59)
+    if (hour < 0 || hour > 12 || min < 0 || hour > 59)
         return false;
     return true;
 }
