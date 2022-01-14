@@ -44,7 +44,7 @@ void output(Node *peak);
 int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yArrive);
 int find_time_max(Node* peak);
 bool check_input_date(int day, int month, int year);
-bool check_time(int hour, int min);
+bool check_input_time(int hour, int min);
 
 int main()
 {
@@ -246,16 +246,16 @@ void input_train_info(Train &train)
         cout <<  "Input depart time(HH:MM): ";
         getline(cin, train.departTime.hour, ':');
         getline(cin, train.departTime.minute);
-        if (!check_time(stoi(train.departTime.hour), stoi(train.departTime.minute)))
+        if (!check_input_time(stoi(train.departTime.hour), stoi(train.departTime.minute)))
             cout << "Invalid\n";
-    } while (!check_time(stoi(train.departTime.hour), stoi(train.departTime.minute)));
+    } while (!check_input_time(stoi(train.departTime.hour), stoi(train.departTime.minute)));
     do {
         cout << "Input arrival time(HH:MM): ";
         getline(cin, train.arrivalTime.hour, ':');
         getline(cin, train.arrivalTime.minute);
-        if (!check_time(stoi(train.arrivalTime.hour), stoi(train.arrivalTime.minute)))
+        if (!check_input_time(stoi(train.arrivalTime.hour), stoi(train.arrivalTime.minute)))
             cout << "Invalid\n";
-    } while (!check_time(stoi(train.departTime.hour), stoi(train.arrivalTime.minute)));
+    } while (!check_input_time(stoi(train.departTime.hour), stoi(train.arrivalTime.minute)));
     do {
         cout << "Input depart date(dd/mm/yyyy): ";
         getline(cin, train.departDate.day, '/');
@@ -703,7 +703,7 @@ bool check_input_date(int day, int month, int year)
     return true;
 }
 
-bool check_time(int hour, int min)
+bool check_input_time(int hour, int min)
 {
     if (hour < 0 || hour > 12 || min < 0 || hour > 59)
         return false;
