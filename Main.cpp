@@ -2,6 +2,7 @@
 #include <string>
 #include <conio.h>
 #include <fstream>
+#include "Console.h"
 using namespace std;
 
 struct Time {
@@ -21,6 +22,7 @@ struct Node {
     Node *next;
 };
 
+int x = 40, y = 13;
 
 void init(Node *&peak);
 void push(Train x, Node *&peak);
@@ -45,33 +47,26 @@ int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yA
 int find_time_max(Node* peak);
 bool check_input_date(int day, int month, int year);
 bool check_input_time(int hour, int min);
+void menu(int &check);
+void clear_menu();
+void draw_title(string title[]);
 
 int main()
 {
+    ShowCur(false);
     Train train;
-    Node *sp;
+    Node *sp = NULL;
     Node *sortHead_asc, *sortHead_desc;
     bool check = false, sortIn = false;
-    int choose;
+    int in = 0;
     do {
         system("cls");
-        cout << "1. Add train\n"
-            << "2. Add train from file\n"
-            << "3. Remove train\n"
-            << "4. Sort train ascending\n"
-            << "5. Sort train after adding a new train\n"
-            << "6. Count trip\n"
-            << "7. Find trip max\n"
-            << "8. Count the number of passengers in Tet holiday\n"
-            << "9. Find the most runtime train\n"
-            << "10. Quit\n"
-            << "Choose: ";
-        cin >> choose;
-        switch (choose)
+        menu(in); 
+        switch (in)
         {
             case 1:
-            {
-                if (!check)
+                clear_menu();
+                if(!check)
                 {
                     init(sp);
                     input_train_info(train);
@@ -83,39 +78,56 @@ int main()
                     input_train_info(train);
                     push(train, sp);
                 }
+                in = 0;
                 break;
-            }
             case 2:
-            {
+                clear_menu();
                 init(sp);
                 delete_list(sp);
                 input_train_info_from_file(train, sp);
                 check = true;
+                in = 0;
                 break;
-            }
             case 3:
-            {
+                clear_menu();
                 if (check)
                 {
                     if (pop(train, sp))
-                        cout << "Trip ID: " << train.tripID << endl
-                            << "Train ID: " << train.trainID << endl
-                            << "Departure: " << train.departure << endl
-                            << "Destination: " << train.destination << endl
-                            << "Depart time: " << train.departTime.hour << ":" << train.departTime.minute << endl
-                            << "Arrival Time: " << train.arrivalTime.hour << ":" << train.arrivalTime.minute << endl
-                            << "Depart Date: " << train.departDate.day << "/" << train.departDate.month << "/" << train.departDate.year << endl
-                            << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl
-                            << "The number of passengers: " << train.passenger;
+                    {
+                        gotoXY(x, y++);
+                        cout << "Trip ID: " << train.tripID << endl;
+                        gotoXY(x, y++);
+                        cout << "Train ID: " << train.trainID << endl;
+                        gotoXY(x, y++);
+                        cout << "Departure: " << train.departure << endl;
+                        gotoXY(x,y++);
+                        cout << "Destination: " << train.destination << endl;
+                        gotoXY(x, y++);
+                        cout << "Depart time: " << train.departTime.hour << ":" << train.departTime.minute << endl;
+                        gotoXY(x, y++);
+                        cout << "Arrival Time: " << train.arrivalTime.hour << ":" << train.arrivalTime.minute << endl;
+                        gotoXY(x, y++);
+                        cout << "Depart Date: " << train.departDate.day << "/" << train.departDate.month << "/" << train.departDate.year << endl;
+                        gotoXY(x, y++);
+                        cout << "Arrival Date: " << train.arrivalDate.day << "/" << train.arrivalDate.month << "/" << train.arrivalDate.year << endl;
+                        gotoXY(x, y++);
+                        cout << "The number of passengers: " << train.passenger;
+                    }
                     else
+                    {
+                        gotoXY(x, y++);
                         cout << "There is no train";
+                    }
                 }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             case 4:
-            {
+                clear_menu();
                 if (check)
                 {
                     init(sortHead_asc);
@@ -125,11 +137,15 @@ int main()
                     sortIn = true;
                 }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             case 5:
-            {   if (check)
+                clear_menu();
+                if (check)
                 {
                     if (sortIn)
                     {
@@ -139,67 +155,91 @@ int main()
                         traverse_list(sortHead_asc);
                     }
                     else
+                    {
+                        gotoXY(x, y++);
                         cout << "You must choose the option 4 first";
-                } 
+                    }
+                }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             case 6:
-            {
+                clear_menu();
                 if (check)
                 {
-                    Node *countTrip;
-                    Node *archive;
+                    Node* countTrip;
+                    Node* archive;
                     init(countTrip);
                     init(archive);
                     count_trip(countTrip, sp, archive);
                     while (archive != NULL)
                     {
-                        cout << archive->info.trainID << ": " << archive->info.trips << endl;
+                        gotoXY(x, y++);
+                        cout << archive->info.trainID << ": " << archive->info.trips;
                         archive = archive->next;
                     }
                 }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
-                break;
-            }
+                }
+                in = 0;
+                break;  
             case 7:
-            {
+                clear_menu();
                 if (check)
                 {
-                    Node *tripMax;
-                    Node *archive;
+                    Node* tripMax;
+                    Node* archive;
                     init(tripMax);
                     init(archive);
                     find_trip_max(tripMax, sp, archive);
                 }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             case 8:
-            {
+                clear_menu();
                 if (check)
-                    cout << "The number of passengers used train in Tet holiday: "
-                        << count_passenger(sp) << endl;
+                {
+                    gotoXY(x, y++);
+                    cout << "The number of passengers used train in Tet holiday: " << count_passenger(sp);
+                }
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             case 9:
-            {
+                clear_menu();
                 if (check)
                     count_time(sp);
                 else
+                {
+                    gotoXY(x, y++);
                     cout << "No data";
+                }
+                in = 0;
                 break;
-            }
             default:
+                clear_menu();
+                gotoXY(x, y++);
+                SetColor(7);
                 cout << "You just quitted";
         }
         _getch();
-    } while (choose >= 1 && choose <= 8);
+    } while (in != 10);
     _getch();
     return 0;
 }
@@ -233,50 +273,74 @@ int pop(Train &x, Node *&peak)
 
 void input_train_info(Train &train)
 {
+    gotoXY(x, y++);
     cout << "Input trip ID: ";
     cin >> train.tripID;
+    gotoXY(x, y++);
     cout << "Input train ID: ";
     cin >> train.trainID;
+    gotoXY(x, y++);
     cout << "Input departure: ";
     cin.ignore();
     getline(cin, train.departure); 
+    gotoXY(x, y++);
     cout << "Input destination: ";
     getline(cin, train.destination);
     do {
+        gotoXY(x, y++);
         cout <<  "Input depart time(HH:MM): ";
         getline(cin, train.departTime.hour, ':');
         getline(cin, train.departTime.minute);
         if (!check_input_time(stoi(train.departTime.hour), stoi(train.departTime.minute)))
+        {
+            gotoXY(x, y++);
             cout << "Invalid\n";
+        }
     } while (!check_input_time(stoi(train.departTime.hour), stoi(train.departTime.minute)));
     do {
+        gotoXY(x, y++);
         cout << "Input arrival time(HH:MM): ";
         getline(cin, train.arrivalTime.hour, ':');
         getline(cin, train.arrivalTime.minute);
         if (!check_input_time(stoi(train.arrivalTime.hour), stoi(train.arrivalTime.minute)))
+        {
+            gotoXY(x, y++);
             cout << "Invalid\n";
+        }
     } while (!check_input_time(stoi(train.departTime.hour), stoi(train.arrivalTime.minute)));
     do {
+        gotoXY(x, y++);
         cout << "Input depart date(dd/mm/yyyy): ";
         getline(cin, train.departDate.day, '/');
         getline(cin, train.departDate.month, '/');
         getline(cin, train.departDate.year);        
         if (!check_input_date(stoi(train.departDate.day), stoi(train.departDate.month), stoi(train.departDate.year)))
+        {
+            gotoXY(x, y++);
             cout << "Invalid input\n";
+        }
     } while (!check_input_date(stoi(train.departDate.day), stoi(train.departDate.month), stoi(train.departDate.year)));
     do {
+        gotoXY(x, y++);
         cout << "Input arrival date(dd/mm/yyyy): ";
         getline(cin, train.arrivalDate.day, '/');
         getline(cin, train.arrivalDate.month, '/');
         getline(cin, train.arrivalDate.year);
         if (!check_input_date(stoi(train.arrivalDate.day), stoi(train.arrivalDate.month), stoi(train.arrivalDate.year)))
+        {
+            gotoXY(x, y++);
             cout << "Invalid input\n";
+        }
     } while(!check_input_date(stoi(train.arrivalDate.day), stoi(train.arrivalDate.month), stoi(train.arrivalDate.year)));
     do {
+        gotoXY(x, y++);
         cout << "Input the number of passengers: ";
         cin >> train.passenger;
         if (stoi(train.passenger) < 0)
+        {
+            gotoXY(x, y++);
             cout << "Invalid input";
+        }
     } while (stoi(train.passenger) < 0);
 }
 
@@ -306,6 +370,7 @@ void input_train_info_from_file(Train &train, Node *&peak)
             if (!inTrain.eof())
                 push(train, peak);
         }
+        gotoXY(x, y++);
         cout << "Read file successfully";
         inTrain.close();
     }
@@ -449,13 +514,14 @@ void traverse_list(Node *peak)
     p = peak;
     while (p != NULL)
     {
+        gotoXY(x, y++);
         cout << p->info.trainID << ": "
             << p->info.departDate.day << "/"
             << p->info.departDate.month << "/"
             << p->info.departDate.year << " - "
             << p->info.arrivalDate.day << "/"
             << p->info.arrivalDate.month << "/"
-            << p->info.arrivalDate.year << endl;
+            << p->info.arrivalDate.year;
         p = p->next;
     }
 }
@@ -464,13 +530,14 @@ void output(Node *peak)
 {
     Node *p;
     p = peak;
+    gotoXY(x, y++);
     cout << p->info.trainID << ": "
         << p->info.departDate.day << "/"
         << p->info.departDate.month << "/"
         << p->info.departDate.year << " - "
         << p->info.arrivalDate.day << "/"
         << p->info.arrivalDate.month << "/"
-        << p->info.arrivalDate.year << endl;
+        << p->info.arrivalDate.year;
 }
 
 int count_passenger(Node *peak)
@@ -570,10 +637,12 @@ void find_trip_max(Node *peak, Node *originalHead, Node *&archive)
         }    
         p = p->next;
     }
+    gotoXY(x, y++);
     cout << "Train with the most trips: " << endl;
     while (maxList != NULL)
     {
-        cout << maxList->info.trainID << ": " << maxList->info.trips << endl;
+        gotoXY(x, y++);
+        cout << maxList->info.trainID << ": " << maxList->info.trips;
         maxList = maxList->next;
     }
 }
@@ -622,9 +691,7 @@ void count_time(Node* peak)
         int totalM;
         totalM = minB - minA;
         if (max == totalM)
-        {
             output(p);
-        }
         p = p->next;
     }
 }
@@ -705,7 +772,131 @@ bool check_input_date(int day, int month, int year)
 
 bool check_input_time(int hour, int min)
 {
-    if (hour < 0 || hour > 12 || min < 0 || hour > 59)
+    if (hour < 0 || hour > 23 || min < 0 || hour > 59)
         return false;
     return true;
+}
+
+void menu(int &check)
+{
+    int set[] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
+    char key;
+    int pos = 1;
+    while (check == 0)
+    {
+        string title[8] =
+        {
+            ".########.########.....###....####.##....##",
+            "....##....##.....##...##.##....##..###...##",
+            "....##....##.....##..##...##...##..####..##",
+            "....##....########..##.....##..##..##.##.##",
+            "....##....##...##...#########..##..##..####",
+            "....##....##....##..##.....##..##..##...###",
+            "....##....##.....##.##.....##.####.##....##",
+        };
+        draw_title(title);
+        gotoXY(3, 28);
+        SetColor(7);
+        cout << "Note: use arrow keys to move";
+        gotoXY(40, 13);
+        SetColor(set[0]);
+        cout << "Add train";
+        gotoXY(40, 14);
+        SetColor(set[1]);
+        cout << "Add train from file";
+        gotoXY(40, 15);
+        SetColor(set[2]);
+        cout << "Remove train";
+        gotoXY(40, 16);
+        SetColor(set[3]);
+        cout << "Sort train ascending";
+        gotoXY(40, 17);
+        SetColor(set[4]);
+        cout << "Sort train after adding a new train";
+        gotoXY(40, 18);
+        SetColor(set[5]);
+        cout << "Count trip";
+        gotoXY(40, 19);
+        SetColor(set[6]);
+        cout << "Find trip max";
+        gotoXY(40, 20);
+        SetColor(set[7]);
+        cout << "Count the number of passengers in Tet holiday";
+        gotoXY(40, 21);
+        SetColor(set[8]);
+        cout << "Find the most runtime train";
+        gotoXY(40, 22);
+        SetColor(set[9]);
+        cout << "Quit";
+        if (_kbhit())
+        {
+            key = _getch();
+            if (key == -32)
+            {
+                key = _getch();
+                if (key == 80 && (pos >= 1 && pos < 10))
+                    pos++;
+                if (key == 72 && (pos <= 10 && pos > 1))
+                    pos--;
+            }
+            else if (key == 13)
+            {
+                switch (pos)
+                {
+                    case 1: check = 1; break;
+                    case 2: check = 2; break;
+                    case 3: check = 3; break;
+                    case 4: check = 4; break;
+                    case 5: check = 5; break;
+                    case 6: check = 6; break;
+                    case 7: check = 7; break;
+                    case 8: check = 8; break;
+                    case 9: check = 9; break;
+                    case 10: check = 10; break;
+                }
+            }
+        }
+        for (int i = 0; i < 10; i++)
+            set[i] = 7;
+        for (int i = 1; i <= 10; i++)
+            if (pos == i)
+                set[pos - 1] = 12;
+    }
+}
+
+void draw_title(string title[])
+{
+    int x1 = 40, y1 = 1;
+    for (int i = 0; i < 8; i++)
+    {
+        gotoXY(x1, y1);
+        SetColor(3);
+        cout << title[i];
+        y1++;
+    }
+}
+
+void clear_menu()
+{
+    int x1 = 40, y1 = 13;
+    string space[11] = 
+    {
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+        "                                              ",
+    };
+    for (int i = 0; i < 11; i++)
+    {
+        gotoXY(x1, y1);
+        cout << space[i];
+        y1++;
+    }
+    x = 40; y = 13;
 }
