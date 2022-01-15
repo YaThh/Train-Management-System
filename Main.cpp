@@ -23,15 +23,16 @@ struct Node {
 };
 
 int x = 40, y = 13;
-string title[8] =
+string title[9] =
         {
-            ".########.########.....###....####.##....##",
-            "....##....##.....##...##.##....##..###...##",
-            "....##....##.....##..##...##...##..####..##",
-            "....##....########..##.....##..##..##.##.##",
-            "....##....##...##...#########..##..##..####",
-            "....##....##....##..##.....##..##..##...###",
-            "....##....##.....##.##.....##.####.##....##",
+           " _             _                                                     ",
+            "| |           (_)                                                    ",
+            "| |_ _ __ __ _ _ _ __    _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ",
+            "| __| '__/ _` | | '_ \\  | '_ ` _ \\ / _` | '_ \\ / _` |/ _` |/ _ \\ '__|",
+            "| |_| | | (_| | | | | | | | | | | | (_| | | | | (_| | (_| |  __/ |   ",
+            " \\__|_|  \\__,_|_|_| |_| |_| |_| |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_|   ",
+            "                                                      __/ |          ",
+            "                                                      |___/           ",
         };
 
 void init(Node *&peak);
@@ -69,7 +70,7 @@ int main()
     Train train;
     Node *sp = NULL;
     Node *sortHead_asc, *sortHead_desc;
-    bool check = false;
+    bool check = false, checkSort = false;
     int in = 0, sortIn = 0;
     do {
         Menu:
@@ -154,12 +155,14 @@ int main()
                                 sort_train_asc(sortHead_asc);
                                 traverse_list(sortHead_asc);
                                 sortIn = 0;
+                                checkSort = true;
                                 break;
                             case 2:
                                 init(sortHead_desc);
                                 clone_list(sortHead_desc, sp);
                                 sort_train_desc(sortHead_desc);
                                 traverse_list(sortHead_desc);
+                                checkSort = true;
                                 sortIn = 0;
                                 break;
                             default:
@@ -182,7 +185,7 @@ int main()
                 clear_menu();
                 if (check)
                 {
-                    if (sortIn)
+                    if (checkSort)
                     {
                         input_train_info(train);
                         push(train, sortHead_asc);
@@ -885,9 +888,11 @@ void menu(int &check)
     {
         
         draw_title(title);
-        gotoXY(3, 28);
+        gotoXY(2, 27);
         SetColor(7);
-        cout << "Note: use arrow keys to move";
+        cout << "Note: use arrow keys to move,";
+        gotoXY(2, 28);
+        cout << "press ENTER to choose";
         gotoXY(40, 13);
         SetColor(set[0]);
         cout << "Add train";
@@ -960,8 +965,8 @@ void menu(int &check)
 
 void draw_title(string title[])
 {
-    int x1 = 40, y1 = 1;
-    for (int i = 0; i < 8; i++)
+    int x1 = 28, y1 = 1;
+    for (int i = 0; i < 9; i++)
     {
         gotoXY(x1, y1);
         SetColor(3);
@@ -1041,4 +1046,3 @@ void menu_sort(int &check)
                 set[pos - 1] = 12;
     }
 }
-
