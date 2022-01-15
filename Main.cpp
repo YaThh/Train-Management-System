@@ -14,7 +14,7 @@ struct Train {
     string departure, destination;
     string passenger;
     Time departTime, arrivalTime, departDate, arrivalDate;
-    int trips;
+    int trips, date;
 };
 
 struct Node {
@@ -23,6 +23,16 @@ struct Node {
 };
 
 int x = 40, y = 13;
+string title[8] =
+        {
+            ".########.########.....###....####.##....##",
+            "....##....##.....##...##.##....##..###...##",
+            "....##....##.....##..##...##...##..####..##",
+            "....##....########..##.....##..##..##.##.##",
+            "....##....##...##...#########..##..##..####",
+            "....##....##....##..##.....##..##..##...###",
+            "....##....##.....##.##.....##.####.##....##",
+        };
 
 void init(Node *&peak);
 void push(Train x, Node *&peak);
@@ -47,9 +57,11 @@ int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yA
 int find_time_max(Node* peak);
 bool check_input_date(int day, int month, int year);
 bool check_input_time(int hour, int min);
+void count_date(Node* peak, Node* originalHead, Node*& archive);
 void menu(int &check);
 void clear_menu();
 void draw_title(string title[]);
+void menu_sort(int &check);
 
 int main()
 {
@@ -57,9 +69,10 @@ int main()
     Train train;
     Node *sp = NULL;
     Node *sortHead_asc, *sortHead_desc;
-    bool check = false, sortIn = false;
-    int in = 0;
+    bool check = false;
+    int in = 0, sortIn = 0;
     do {
+        Menu:
         system("cls");
         menu(in); 
         switch (in)
@@ -130,18 +143,40 @@ int main()
                 clear_menu();
                 if (check)
                 {
-                    init(sortHead_asc);
-                    clone_list(sortHead_asc, sp);
-                    sort_train_asc(sortHead_asc);
-                    traverse_list(sortHead_asc);
-                    sortIn = true;
+                    do {
+                        system("cls");
+                        menu_sort(sortIn);
+                        switch (sortIn)
+                        {
+                            case 1:
+                                init(sortHead_asc);
+                                clone_list(sortHead_asc, sp);
+                                sort_train_asc(sortHead_asc);
+                                traverse_list(sortHead_asc);
+                                sortIn = 0;
+                                break;
+                            case 2:
+                                init(sortHead_desc);
+                                clone_list(sortHead_desc, sp);
+                                sort_train_desc(sortHead_desc);
+                                traverse_list(sortHead_desc);
+                                sortIn = 0;
+                                break;
+                            default:
+                                sortIn = 0;
+                                in = 0;
+                                goto Menu;
+                        }
+                        _getch();
+                    } while (sortIn != 3);
                 }
                 else
                 {
                     gotoXY(x, y++);
                     cout << "No data";
+                    sortIn = 0;
+                    in = 0;
                 }
-                in = 0;
                 break;
             case 5:
                 clear_menu();
@@ -232,6 +267,29 @@ int main()
                 }
                 in = 0;
                 break;
+            case 10:
+                clear_menu();
+                if (check)
+                {
+                    Node* countDate;
+                    Node* archive;
+                    init(countDate);
+                    init(archive);
+                    count_date(countDate, sp, archive);
+                while (archive != NULL)
+                {
+                    gotoXY(x, y++);
+                    cout << archive->info.departDate.day << "/" << archive->info.departDate.month << "/" << archive->info.departDate.year << ": " << archive->info.date << endl;
+                    archive = archive->next;
+                }
+                }
+                else
+                {
+                    gotoXY(x, y++);
+                    cout << "No data";
+                }
+                in = 0;
+                break;
             default:
                 clear_menu();
                 gotoXY(x, y++);
@@ -239,7 +297,7 @@ int main()
                 cout << "You just quitted";
         }
         _getch();
-    } while (in != 10);
+    } while (in != 11);
     _getch();
     return 0;
 }
@@ -524,6 +582,7 @@ void traverse_list(Node *peak)
             << p->info.arrivalDate.year;
         p = p->next;
     }
+    x = 40; y = 13;
 }
 
 void output(Node *peak)
@@ -777,23 +836,54 @@ bool check_input_time(int hour, int min)
     return true;
 }
 
+void count_date(Node* peak, Node* originalHead, Node*& archive)
+{
+    clone_list(peak, originalHead);
+    sort_train_desc(peak);
+    Node* p = peak;
+    Node* q = p->next;
+    while (p != NULL)
+    {
+        int count = 1;
+        while ((p->info.departDate.day == q->info.departDate.day)
+            && (p->info.departDate.month == q->info.departDate.month)
+            && (p->info.departDate.year == q->info.departDate.year))
+        {
+            if (q->next != NULL)
+            {
+                count++;
+                q = q->next;
+            }
+            else
+                break;
+        }
+        p->info.date = count;
+        if (count != 1)
+        {
+            push(p->info, archive);
+            while (p != q)
+                p = p->next;
+            if (q->next != NULL)
+                q = p->next;
+        }
+        else
+        {
+            push(p->info, archive);
+            p = p->next;
+            if (q->next != NULL)
+                q = p->next;
+        }
+    }
+}
+
 void menu(int &check)
 {
-    int set[] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
+    int set[] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
     char key;
     int pos = 1;
     while (check == 0)
     {
-        string title[8] =
-        {
-            ".########.########.....###....####.##....##",
-            "....##....##.....##...##.##....##..###...##",
-            "....##....##.....##..##...##...##..####..##",
-            "....##....########..##.....##..##..##.##.##",
-            "....##....##...##...#########..##..##..####",
-            "....##....##....##..##.....##..##..##...###",
-            "....##....##.....##.##.....##.####.##....##",
-        };
+        
         draw_title(title);
         gotoXY(3, 28);
         SetColor(7);
@@ -809,7 +899,7 @@ void menu(int &check)
         cout << "Remove train";
         gotoXY(40, 16);
         SetColor(set[3]);
-        cout << "Sort train ascending";
+        cout << "Sort train's date";
         gotoXY(40, 17);
         SetColor(set[4]);
         cout << "Sort train after adding a new train";
@@ -827,6 +917,9 @@ void menu(int &check)
         cout << "Find the most runtime train";
         gotoXY(40, 22);
         SetColor(set[9]);
+        cout << "Find the most trips in days";
+        gotoXY(40, 23);
+        SetColor(set[10]);
         cout << "Quit";
         if (_kbhit())
         {
@@ -834,9 +927,9 @@ void menu(int &check)
             if (key == -32)
             {
                 key = _getch();
-                if (key == 80 && (pos >= 1 && pos < 10))
+                if (key == 80 && (pos >= 1 && pos < 11))
                     pos++;
-                if (key == 72 && (pos <= 10 && pos > 1))
+                else if (key == 72 && (pos <= 11 && pos > 1))
                     pos--;
             }
             else if (key == 13)
@@ -853,12 +946,13 @@ void menu(int &check)
                     case 8: check = 8; break;
                     case 9: check = 9; break;
                     case 10: check = 10; break;
+                    case 11: check = 11; break;
                 }
             }
         }
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 11; i++)
             set[i] = 7;
-        for (int i = 1; i <= 10; i++)
+        for (int i = 1; i <= 11; i++)
             if (pos == i)
                 set[pos - 1] = 12;
     }
@@ -879,8 +973,9 @@ void draw_title(string title[])
 void clear_menu()
 {
     int x1 = 40, y1 = 13;
-    string space[11] = 
+    string space[12] = 
     {
+        "                                              ",
         "                                              ",
         "                                              ",
         "                                              ",
@@ -900,3 +995,50 @@ void clear_menu()
     }
     x = 40; y = 13;
 }
+
+void menu_sort(int &check)
+{
+    int set[] = {7, 7, 7};
+    char key;
+    int pos = 1;
+    while (check == 0)
+    {
+        draw_title(title);
+        gotoXY(40, 13);
+        SetColor(set[0]);
+        cout << "Sort train's date ascending";
+        gotoXY(40, 14);
+        SetColor(set[1]);
+        cout << "Sort train's date descending";
+        gotoXY(40, 15);
+        SetColor(set[2]);
+        cout << "Go back to main menu";
+        if (_kbhit())
+        {
+            key = _getch();
+            if (key == -32)
+            {
+                key = _getch();
+                if (key == 80 && (pos >= 1 && pos < 3))
+                    pos++;
+                else if (key == 72 && (pos > 1 && pos <=3))
+                    pos--;
+            }
+            else if (key == 13)
+            {
+                switch (pos)
+                {
+                    case 1: check = 1; break; 
+                    case 2: check = 2; break;
+                    case 3: check = 3; break;
+                }
+            }
+        }
+        for (int i = 0; i < 3; i++)
+            set[i] = 7;
+        for (int i = 1; i <= 3; i++)
+            if (pos == i)
+                set[pos - 1] = 12;
+    }
+}
+
