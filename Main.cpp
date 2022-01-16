@@ -98,7 +98,6 @@ int main()
                 init(sp);
                 delete_list(sp);
                 input_train_info_from_file(train, sp);
-                traverse_list(sp);
                 check = true;
                 in = 0;
                 break;
@@ -663,6 +662,11 @@ void count_trip(Node *peak, Node *originalPeak, Node *&archive)
                 q = p->next;
         }
     }
+    if (p->next == NULL && !search_list(archive, p->info.trainID))
+    {
+        p->info.trips = 1;
+        push(p->info, archive);
+    }
 }
 
 void sort_list(Node* peak)
@@ -689,13 +693,6 @@ void sort_list(Node* peak)
 void find_trip_max(Node *peak, Node *originalPeak, Node *&archive)
 {
     count_trip(peak, originalPeak, archive);
-    /*Node *t = archive;
-    while (t != NULL)
-    {
-        gotoXY(x, y++);
-        cout << t->info.trainID << " " << t->info.trips;
-        t = t->next;
-    }*/
     Node *maxList = NULL;
     Node *p = archive;
     Node *q;
