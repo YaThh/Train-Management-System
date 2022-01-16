@@ -25,7 +25,7 @@ struct Node {
 int x = 40, y = 13;
 string title[9] =
         {
-           " _             _                                                     ",
+            " _             _                                                     ",
             "| |           (_)                                                    ",
             "| |_ _ __ __ _ _ _ __    _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ",
             "| __| '__/ _` | | '_ \\  | '_ ` _ \\ / _` | '_ \\ / _` |/ _` |/ _ \\ '__|",
@@ -52,7 +52,7 @@ void delete_first(Node *&peak);
 void delete_list(Node *&peak);
 int search_list(Node *peak, string trainID);
 void count_time(Node *peak);
-int find_time_max(Node* peak);
+int find_trip_max(Node* peak);
 void output(Node *peak);
 int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yArrive);
 int find_time_max(Node* peak);
@@ -250,7 +250,7 @@ int main()
                 if (check)
                 {
                     gotoXY(x, y++);
-                    cout << "The number of passengers used train in Tet holiday: " << count_passenger(sp);
+                    cout << "The number of passengers used train in New Year: " << count_passenger(sp);
                 }
                 else
                 {
@@ -895,37 +895,37 @@ void menu(int &check)
         cout << "press ENTER to choose";
         gotoXY(40, 13);
         SetColor(set[0]);
-        cout << "Add train";
+        cout << "1. Add train";
         gotoXY(40, 14);
         SetColor(set[1]);
-        cout << "Add train from file";
+        cout << "2. Add train from file";
         gotoXY(40, 15);
         SetColor(set[2]);
-        cout << "Remove train";
+        cout << "3. Remove train";
         gotoXY(40, 16);
         SetColor(set[3]);
-        cout << "Sort train's date";
+        cout << "4. Sort train's date";
         gotoXY(40, 17);
         SetColor(set[4]);
-        cout << "Sort train after adding a new train";
+        cout << "5. Sort train after adding a new train";
         gotoXY(40, 18);
         SetColor(set[5]);
-        cout << "Count trip";
+        cout << "6. Count trip";
         gotoXY(40, 19);
         SetColor(set[6]);
-        cout << "Find trip max";
+        cout << "7. Find trains with the most trips";
         gotoXY(40, 20);
         SetColor(set[7]);
-        cout << "Count the number of passengers in Tet holiday";
+        cout << "8. Count the number of passengers in New Year";
         gotoXY(40, 21);
         SetColor(set[8]);
-        cout << "Find the most runtime train";
+        cout << "9. Find the most runtime train";
         gotoXY(40, 22);
         SetColor(set[9]);
-        cout << "Find the most trips in days";
+        cout << "10. Find the most trips in days";
         gotoXY(40, 23);
         SetColor(set[10]);
-        cout << "Quit";
+        cout << "11. Quit";
         if (_kbhit())
         {
             key = _getch();
