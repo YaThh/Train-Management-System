@@ -98,6 +98,7 @@ int main()
                 init(sp);
                 delete_list(sp);
                 input_train_info_from_file(train, sp);
+                traverse_list(sp);
                 check = true;
                 in = 0;
                 break;
@@ -427,8 +428,7 @@ void input_train_info_from_file(Train &train, Node *&peak)
             getline(inTrain, train.arrivalDate.month, '/');
             getline(inTrain, train.arrivalDate.year, '#');
             getline(inTrain, train.passenger);
-            if (!inTrain.eof())
-                push(train, peak);
+            push(train, peak);
         }
         gotoXY(x, y++);
         cout << "Read file successfully";
@@ -617,13 +617,22 @@ int count_passenger(Node *peak)
 
 void count_trip(Node *peak, Node *originalPeak, Node *&archive)
 {
+    int count;
+    if (originalPeak == NULL)
+        return;
     clone_list(peak, originalPeak);
+    if (peak->next == NULL)
+    {
+        peak->info.trips = 1;
+        push(peak->info, archive);
+        return;
+    }
     sort_list(peak);
     Node *p = peak;
     Node *q = p->next;
-    while (p != NULL)
+    while (p->next != NULL)
     {
-        int count = 1;
+        count = 1;
         while (q->info.trainID == p->info.trainID)
         {
             if (q->next != NULL)
@@ -632,7 +641,10 @@ void count_trip(Node *peak, Node *originalPeak, Node *&archive)
                 q = q->next;
             }
             else
+            {
+                count++;
                 break;
+            }
         } 
         p->info.trips = count;
         if (count != 1)
