@@ -689,10 +689,18 @@ void sort_list(Node* peak)
 void find_trip_max(Node *peak, Node *originalPeak, Node *&archive)
 {
     count_trip(peak, originalPeak, archive);
+    /*Node *t = archive;
+    while (t != NULL)
+    {
+        gotoXY(x, y++);
+        cout << t->info.trainID << " " << t->info.trips;
+        t = t->next;
+    }*/
     Node *maxList = NULL;
     Node *p = archive;
     Node *q;
     int max = p->info.trips;
+    push(p->info, maxList);
     while (p != NULL)
     {
         q = p->next;
