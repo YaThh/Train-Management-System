@@ -52,7 +52,6 @@ void delete_first(Node *&peak);
 void delete_list(Node *&peak);
 int search_list(Node *peak, string trainID);
 void count_time(Node *peak);
-int find_trip_max(Node* peak);
 void output(Node *peak);
 int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yArrive);
 int find_time_max(Node* peak);
