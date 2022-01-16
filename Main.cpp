@@ -40,14 +40,14 @@ void push(Train x, Node *&peak);
 int pop(Train &x, Node *&peak);
 void input_train_info(Train &train);
 void input_train_info_from_file(Train &train, Node *&peak);
-void clone_list(Node *&head, Node *originalHead);
+void clone_list(Node *&peak, Node *originalPeak);
 void sort_train_asc(Node *peak);
 void sort_train_desc(Node *peak);
 void traverse_list(Node *peak);
 int count_passenger(Node *peak);
-void count_trip(Node *peak, Node *originalHead, Node *&archive);
+void count_trip(Node *peak, Node *originalPeak, Node *&archive);
 void sort_list(Node* peak);
-void find_trip_max(Node *peak, Node *originalHead, Node *&archive);
+void find_trip_max(Node *peak, Node *originalPeak, Node *&archive);
 void delete_first(Node *&peak);
 void delete_list(Node *&peak);
 int search_list(Node *peak, string trainID);
@@ -57,7 +57,7 @@ int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yA
 int find_time_max(Node* peak);
 bool check_input_date(int day, int month, int year);
 bool check_input_time(int hour, int min);
-void count_date(Node* peak, Node* originalHead, Node*& archive);
+void count_date(Node* peak, Node* originalPeak, Node*& archive);
 void menu(int &check);
 void clear_menu();
 void draw_title(string title[]);
@@ -438,16 +438,16 @@ void input_train_info_from_file(Train &train, Node *&peak)
         cout << "Could not read the file";
 }
 
-void clone_list(Node *&head, Node *originalHead)
+void clone_list(Node *&peak, Node *originalPeak)
 {
     Node *sortList;
-    Node *origin = originalHead;
+    Node *origin = originalPeak;
     while (origin != NULL)
     {
         sortList = new Node;
         sortList->info = origin->info;
-        sortList->next = head;
-        head = sortList;
+        sortList->next = peak;
+        peak = sortList;
         origin = origin->next;
     }
 }
@@ -615,9 +615,9 @@ int count_passenger(Node *peak)
     return totalPassenger;
 }
 
-void count_trip(Node *peak, Node *originalHead, Node *&archive)
+void count_trip(Node *peak, Node *originalPeak, Node *&archive)
 {
-    clone_list(peak, originalHead);
+    clone_list(peak, originalPeak);
     sort_list(peak);
     Node *p = peak;
     Node *q = p->next;
@@ -674,9 +674,9 @@ void sort_list(Node* peak)
     }
 }
 
-void find_trip_max(Node *peak, Node *originalHead, Node *&archive)
+void find_trip_max(Node *peak, Node *originalPeak, Node *&archive)
 {
-    count_trip(peak, originalHead, archive);
+    count_trip(peak, originalPeak, archive);
     Node *maxList = NULL;
     Node *p = archive;
     Node *q;
@@ -838,9 +838,9 @@ bool check_input_time(int hour, int min)
     return true;
 }
 
-void count_date(Node* peak, Node* originalHead, Node*& archive)
+void count_date(Node* peak, Node* originalPeak, Node*& archive)
 {
-    clone_list(peak, originalHead);
+    clone_list(peak, originalPeak);
     sort_train_desc(peak);
     Node* p = peak;
     Node* q = p->next;
