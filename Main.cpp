@@ -55,6 +55,8 @@ void count_time(Node *peak);
 void output(Node *peak);
 int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yArrive);
 int find_time_max(Node* peak);
+int transform_to_min(int min);
+int transform_to_hour(int min);
 bool check_input_date(int day, int month, int year);
 bool check_input_time(int hour, int min);
 void count_date(Node* peak, Node* originalPeak, Node*& archive);
@@ -646,20 +648,19 @@ void count_trip(Node *peak, Node *originalPeak, Node *&archive)
             }
         } 
         p->info.trips = count;
+        push(p->info, archive);
         if (count != 1)
         {
-            push(p->info, archive);
             while (p != q)
                 p = p->next;
             if (q->next != NULL)
-                q = p->next;
+                q = q->next;
         }
         else
         {
-            push(p->info, archive);
             p = p->next;
             if (q->next != NULL)
-                q = p->next;
+                q = q->next;
         }
     }
     if (p->next == NULL && !search_list(archive, p->info.trainID))
@@ -769,7 +770,10 @@ void count_time(Node* peak)
         int totalM;
         totalM = minB - minA;
         if (max == totalM)
+        {
             output(p);
+            cout << " Total time: " << transform_to_hour(totalM) << " hour " << transform_to_min(totalM) << " minute\n";
+        }
         p = p->next;
     }
 }
@@ -822,6 +826,16 @@ int convert_to_min(Node *p, int min, int hour, int d, int m, int yDepart, int yA
         yConvert = (yDepart - 2000) * 365 * 60 * 24;
     minute = min + hConvert + dConvert + mConvert + yConvert;
     return minute;
+}
+
+int transform_to_min(int min)
+{
+    return min % 60;
+}
+
+int transform_to_hour(int min)
+{
+    return min / 60;
 }
 
 bool check_input_date(int day, int month, int year)
