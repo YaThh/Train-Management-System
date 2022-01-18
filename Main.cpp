@@ -71,7 +71,7 @@ int main()
     Train train;
     Node *sp = NULL;
     Node *sortHead_asc, *sortHead_desc;
-    bool check = false, checkSort = false;
+    bool check = false, checkSortAsc = false, checkSortDesc = false;
     int in = 0, sortIn = 0;
     do {
         Menu:
@@ -156,14 +156,16 @@ int main()
                                 sort_train_asc(sortHead_asc);
                                 traverse_list(sortHead_asc);
                                 sortIn = 0;
-                                checkSort = true;
+                                checkSortAsc = true;
+                                checkSortDesc = false;
                                 break;
                             case 2:
                                 init(sortHead_desc);
                                 clone_list(sortHead_desc, sp);
                                 sort_train_desc(sortHead_desc);
                                 traverse_list(sortHead_desc);
-                                checkSort = true;
+                                checkSortDesc = true;
+                                checkSortAsc = false;
                                 sortIn = 0;
                                 break;
                             default:
@@ -186,13 +188,20 @@ int main()
                 clear_menu();
                 if (check)
                 {
-                    if (checkSort)
+                    if (checkSortAsc)
                     {
                         input_train_info(train);
                         push(train, sortHead_asc);
                         sort_train_asc(sortHead_asc);
                         traverse_list(sortHead_asc);
                     }
+                    else if (checkSortDesc)
+                    {
+                        input_train_info(train);
+                        push(train, sortHead_desc);
+                        sort_train_desc(sortHead_desc);
+                        traverse_list(sortHead_desc);
+                    } 
                     else
                     {
                         gotoXY(x, y++);
