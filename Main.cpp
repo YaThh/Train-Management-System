@@ -230,6 +230,8 @@ int main()
                         cout << archive->info.trainID << ": " << archive->info.trips;
                         archive = archive->next;
                     }
+                    delete archive;
+                    delete countTrip;
                 }
                 else
                 {
@@ -247,6 +249,8 @@ int main()
                     init(tripMax);
                     init(archive);
                     find_trip_max(tripMax, sp, archive);
+                    delete tripMax;
+                    delete archive;
                 }
                 else
                 {
@@ -289,12 +293,14 @@ int main()
                     init(countDate);
                     init(archive);
                     count_date(countDate, sp, archive);
-                while (archive != NULL)
-                {
-                    gotoXY(x, y++);
-                    cout << archive->info.departDate.day << "/" << archive->info.departDate.month << "/" << archive->info.departDate.year << ": " << archive->info.date << endl;
-                    archive = archive->next;
-                }
+                    while (archive != NULL)
+                    {
+                        gotoXY(x, y++);
+                        cout << archive->info.departDate.day << "/" << archive->info.departDate.month << "/" << archive->info.departDate.year << ": " << archive->info.date << endl;
+                        archive = archive->next;
+                    }
+                    delete countDate;
+                    delete archive;
                 }
                 else
                 {
